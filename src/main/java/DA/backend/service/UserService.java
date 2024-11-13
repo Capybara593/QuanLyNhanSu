@@ -1,7 +1,9 @@
 package DA.backend.service;
 
 import DA.backend.entity.IdGenerator;
+import DA.backend.entity.Role;
 import DA.backend.entity.User;
+import DA.backend.repository.RoleRepository;
 import DA.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,9 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +21,8 @@ public class UserService {
     private UserRepository userRepository;
    @Autowired
    private  EmailService emailService;
+    @Autowired
+    private RoleRepository roleRepository;
     public static final Random random = new Random();
     private final BCryptPasswordEncoder paswordHash = new BCryptPasswordEncoder();
 
@@ -29,6 +31,15 @@ public class UserService {
         if(optionalUser.isPresent()){
             return false;
         }
+
+        // Gán vai trò mặc định "EMPLOYEE"
+        Role employeeRole = roleRepository.findByName("EMPLOYEE")
+                .orElseThrow(() -> new RuntimeException("Error: Role EMPLOYEE not found."));
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(employeeRole);
+        user.setRoles(roles);
+
         String userId = IdGenerator.generateUniqueId();
         boolean status = false;
         while (!status){
@@ -42,7 +53,6 @@ public class UserService {
             }catch (DataIntegrityViolationException ex){
                 status = false;
             }
-
         }
         return true;
     }

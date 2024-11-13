@@ -3,14 +3,22 @@ package DA.backend.controller;
 import DA.backend.entity.User;
 import DA.backend.service.EmailService;
 import DA.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/user")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
    private UserService userService;
@@ -18,18 +26,25 @@ public class UserController {
     private EmailService emailService;
 
     @PostMapping("/add")
-    public String addUser(@RequestBody User user){
+    public ResponseEntity<?> addUser(@RequestBody @Valid User user, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> errors = result.getFieldErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errors);
+        }
 
-            if(userService.addUser(user)){
-                emailService.sendEmail(user.getEmail(),
-                        "ACCOUNT",
-                        "ID: " + user.getId()
-                                + "Password: " + user.getId());
-                return "OK";
-            } else {
-                return "Email da ton tai";
-            }
+        if (userService.addUser(user)) {
+            emailService.sendEmail(user.getEmail(),
+                    "ACCOUNT",
+                    "ID: " + user.getId() + " Password: " + user.getId());
+            return ResponseEntity.ok("OK");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email đã tồn tại");
+        }
     }
+
     @PostMapping("/login")
     public String login(@RequestParam String id,@RequestParam String password){
         if(userService.login(id, password)){

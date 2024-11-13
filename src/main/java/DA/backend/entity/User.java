@@ -1,25 +1,47 @@
 package DA.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.util.Date;
+import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "user")
 public class User {
     @Id
     private String id;
+    @NotBlank(message = "Tên không được bỏ trống")
+    @Size(min = 1, max = 50, message = "Tên nằm trong khoảng 1 đến 50 ký tự")
     private String name;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDay;
+
     private String nationality;
     private String homeTown;
     private String address;
+
+    @NotBlank(message = "Email không được bỏ trống")
+    @Size(min = 1, max = 50, message = "Email nằm trong khoảng 1 đến 50 ký tự")
+    @Email
     private String email;
+
+    @Length(min = 10, max = 10, message = "Số điện thoại phải đủ 10 số")
+    @Pattern(regexp = "^[0-9]*$", message = "Số điện thoại phải nhập chữ số")
     private String phoneNumber;
+
     private String image;
     private String sex;
     private String password;
@@ -49,6 +71,13 @@ public class User {
         isDelete = delete;
     }
 
+    // nối
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
     public String getPassword() {
         return password;
