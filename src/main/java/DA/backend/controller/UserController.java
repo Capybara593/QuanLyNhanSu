@@ -3,7 +3,10 @@ package DA.backend.controller;
 import DA.backend.entity.User;
 import DA.backend.service.EmailService;
 import DA.backend.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.apache.catalina.manager.StatusTransformer.writeHeader;
 
 @RestController
 @RequestMapping("api/user")
@@ -107,5 +116,25 @@ public class UserController {
         return userService.checkUser(id);
     }
 
+    // Endpoint để xuất dữ liệu người dùng ra file Excel
+    @GetMapping("/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        // Thiết lập kiểu nội dung cho file Excel
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
+        // Tạo tên file với định dạng thời gian hiện tại để tránh trùng tên
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+        String fileName = "users_" + currentDateTime + ".xlsx";
+
+        // Thiết lập Content-Disposition để trình duyệt nhận diện tên file khi tải về
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+
+        // Lấy danh sách người dùng từ cơ sở dữ liệu và tạo file Excel
+        List<User> listUsers = userService.listUser();
+        UserExcelExporter excelExporter = new UserExcelExporter(listUsers);
+
+        // Gọi phương thức export để ghi file Excel vào output stream của response
+        excelExporter.export(response);
+    }
 }

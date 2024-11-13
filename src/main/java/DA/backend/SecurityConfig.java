@@ -28,7 +28,8 @@ public class SecurityConfig {
                                 ,"/api/department/listDepartment"
                                 , "/api/department/addUser"
                                 ,"/api/department"
-                                ,"/api/department/listDepartmentUser")
+                                ,"/api/department/listDepartmentUser"
+                                , "/api/user/export/excel")
                         .permitAll()
                         .anyRequest().authenticated()
                 );
