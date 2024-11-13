@@ -1,5 +1,6 @@
 package DA.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -71,12 +73,29 @@ public class User {
         isDelete = delete;
     }
 
+
+    public Set<Department> getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Set<Department> department) {
+        this.department = department;
+    }
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_department",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "department_id"))
+    @JsonIgnore
+    private Set<Department> department;
     // nối
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JsonIgnore
     private Set<Role> roles;
 
     public String getPassword() {
