@@ -9,16 +9,22 @@ import jakarta.validation.Valid;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -122,6 +128,14 @@ public class UserController {
         }
         return  false;
     }
+
+    @PostMapping("/add/images")
+    public ResponseEntity<?> addImage(@RequestParam String id, @RequestParam("image")MultipartFile image) throws  IOException{
+       if(userService.addImages(id,image)){
+           return  ResponseEntity.ok("OK");
+       }
+       return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
+    }
     @PostMapping("/resetPassword")
     public String resetPassword(@RequestParam String id, String passwordNew, String passwordNew1){
         try {
@@ -142,7 +156,29 @@ public class UserController {
         UserDTO userDTO = userService.convertToDTO(user);
         return ResponseEntity.ok(userDTO);
     }
+    @GetMapping("/profile/image")
+    public ResponseEntity<byte[]> getUserImage(@RequestParam String id) throws Exception {
+        User user = userService.checkUser(id);
+        if (user == null || user.getImage() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
+        // Giải mã chuỗi Base64 thành byte array
+        byte[] imageBytes = Base64.getDecoder().decode(user.getImage());
+
+        // Đoán loại MIME từ dữ liệu byte array
+        String mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(imageBytes));
+        if (mimeType == null) {
+            mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE; // Dùng giá trị mặc định nếu không xác định được loại MIME
+        }
+
+        // Thiết lập header với loại MIME tương ứng
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(mimeType));
+        headers.setContentLength(imageBytes.length);
+
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
     // Endpoint để xuất dữ liệu người dùng ra file Excel
     @GetMapping("/export/excel")
     public void exportToExcel(HttpServletResponse response) throws IOException {

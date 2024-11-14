@@ -60,4 +60,20 @@ public class Evaluate {
     @JsonIgnore
     private QuestionSet questionSet;
 
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    @ManyToMany
+    @JoinTable(
+            name = "evaluate_user",
+            joinColumns = @JoinColumn(name = "evaluate_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @JsonIgnore
+    private List<User> users;
 }

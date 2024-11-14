@@ -201,4 +201,21 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public List<Evaluate> getEvaluates() {
+        return evaluates;
+    }
+
+    public void setEvaluates(List<Evaluate> evaluates) {
+        this.evaluates = evaluates;
+    }
+
+    @ManyToMany
+    @JoinTable(
+            name = "evaluate_user",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "evaluate_id")
+    )
+    @JsonIgnore
+    private List<Evaluate> evaluates;
 }

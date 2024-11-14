@@ -11,7 +11,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -109,14 +111,11 @@ public class UserService {
                 .filter(User::isDelete)
                 .collect(Collectors.toList());
     }
-    public User checkUser(String id){
-        Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isPresent()){
-            User user = optionalUser.get();
-            return user;
-        }
-        return  null;
+    public User checkUser(String id) {
+        return userRepository.findById(id).orElse(null);
     }
+
+
 
     public boolean checkSendCode( String sendCode){
         if(sendCode.equals(emailService.Code)){
@@ -156,6 +155,7 @@ public class UserService {
         }
         return Optional.empty();
     }
+
     public User convertToEntity(UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
@@ -169,6 +169,23 @@ public class UserService {
         user.setSex(userDTO.getSex());
         user.setImage(userDTO.getImage());
         return user;
+    }
+
+    public boolean addImages(String id, MultipartFile image) throws IOException {
+        if (image == null || image.isEmpty()) {
+            return false;
+        }
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            String encodedImage = Base64.getEncoder().encodeToString(image.getBytes());
+
+            user.setImage(encodedImage);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
 }
