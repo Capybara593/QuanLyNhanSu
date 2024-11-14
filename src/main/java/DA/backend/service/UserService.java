@@ -3,6 +3,7 @@ package DA.backend.service;
 import DA.backend.entity.IdGenerator;
 import DA.backend.entity.Role;
 import DA.backend.entity.User;
+import DA.backend.entity.UserDTO;
 import DA.backend.repository.RoleRepository;
 import DA.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +133,42 @@ public class UserService {
           user.setPassword(encryptedPassword);
             userRepository.save(user);
         }
+    }
+    public UserDTO convertToDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getName());
+        userDTO.setBirthDay(user.getBirthDay());
+        userDTO.setNationality(user.getNationality());
+        userDTO.setHomeTown(user.getHomeTown());
+        userDTO.setAddress(user.getAddress());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setSex(user.getSex());
+        userDTO.setImage(user.getImage());
+        return userDTO;
+    }
+    public Optional<String> getUserImage(String userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return Optional.ofNullable(user.getImage());
+        }
+        return Optional.empty();
+    }
+    public User convertToEntity(UserDTO userDTO) {
+        User user = new User();
+        user.setId(userDTO.getId());
+        user.setName(userDTO.getName());
+        user.setBirthDay(userDTO.getBirthDay());
+        user.setNationality(userDTO.getNationality());
+        user.setHomeTown(userDTO.getHomeTown());
+        user.setAddress(userDTO.getAddress());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setSex(userDTO.getSex());
+        user.setImage(userDTO.getImage());
+        return user;
     }
 
 }
