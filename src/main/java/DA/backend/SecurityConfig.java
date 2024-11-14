@@ -21,6 +21,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // Tắt CSRF theo cách mới
                 .authorizeHttpRequests(auth -> auth  // Sử dụng cấu hình mới cho quyền truy cập
                         .requestMatchers("/api/user/login", "/api/user/add",
+                                "/api/user/profile",
+                                "/api/user/update",
+                                "/api/user/{id}/image",
                                 "/api/department/add"
                                 ,"/api/department/add"
                                 ,"/api/department/update"

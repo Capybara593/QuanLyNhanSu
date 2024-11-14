@@ -1,6 +1,7 @@
 package DA.backend.controller;
 
 import DA.backend.entity.User;
+import DA.backend.entity.UserDTO;
 import DA.backend.service.EmailService;
 import DA.backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,14 +64,35 @@ public class UserController {
         }
     }
     @PutMapping("/update")
-    public String update(@RequestBody User user){
+    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
         try {
+            User user = userService.checkUser(userDTO.getId());
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            // Cập nhật thông tin từ DTO sang entity
+            user = userService.convertToEntity(userDTO);
+
+            // Lưu thông tin
             userService.updateUser(user);
-            return "update success";
-        }catch (Exception ex){
-            return "update faile";
+            return ResponseEntity.ok("Update success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed: " + e.getMessage());
         }
     }
+    // API lấy ảnh đại diện
+    @GetMapping("/{id}/image")
+    public ResponseEntity<String> getAvatar(@PathVariable String id) {
+        Optional<String> optionalImage = userService.getUserImage(id);
+        if (optionalImage.isPresent()) {
+            return ResponseEntity.ok(optionalImage.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/delete")
     public String deleteUser(@RequestParam String id){
         try {
@@ -112,8 +134,13 @@ public class UserController {
 
     }
     @GetMapping("/profile")
-    public User profileUser(@RequestParam String id){
-        return userService.checkUser(id);
+    public ResponseEntity<?> profileUser(@RequestParam String id) {
+        User user = userService.checkUser(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        UserDTO userDTO = userService.convertToDTO(user);
+        return ResponseEntity.ok(userDTO);
     }
 
     // Endpoint để xuất dữ liệu người dùng ra file Excel

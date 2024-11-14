@@ -93,7 +93,6 @@ public class UserService {
             user1.setHomeTown(user.getHomeTown());
             user1.setNationality(user.getNationality());
             user1.setPhoneNumber(user.getPhoneNumber());
-            user1.setPosition(user.getPosition());
             userRepository.save(user1);
         }
     }
