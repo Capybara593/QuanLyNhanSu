@@ -1,6 +1,7 @@
 package DA.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -44,6 +45,7 @@ public class User {
     @Pattern(regexp = "^[0-9]*$", message = "Số điện thoại phải nhập chữ số")
     private String phoneNumber;
 
+    @Lob
     private String image;
     private String sex;
     private String password;
@@ -95,7 +97,7 @@ public class User {
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @JsonIgnore
+    @JsonManagedReference
     private Set<Role> roles;
 
     public String getPassword() {

@@ -1,5 +1,6 @@
 package DA.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +31,7 @@ public class Role {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonIgnore
+    @JsonBackReference
     private List<User> users;
 
     public Role() {}
