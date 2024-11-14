@@ -64,6 +64,18 @@ public class User {
         this.isDelete = isDelete;
     }
 
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    @ManyToOne
+     @JoinColumn(name = "position_id")
+     @JsonIgnore
+     private Position position;
 
     public boolean isDelete() {
         return isDelete;
