@@ -43,7 +43,8 @@ public class SecurityConfig  {
                         ,"/api/evaluate/**"
                         ,"/api/questions/**"
                         ,"/api/questionSet/**"
-                        ,"/api/timeEvaluateRole/**")
+                        ,"/api/timeEvaluateRole/**"
+                        ,"/api/userEvaluate/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 );

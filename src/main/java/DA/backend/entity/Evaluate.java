@@ -80,6 +80,14 @@ public class Evaluate {
         this.userEvaluates = userEvaluates;
     }
 
+    public List<TimeEvaluateRole> getTimeEvaluateRoles() {
+        return timeEvaluateRoles;
+    }
+
+    public void setTimeEvaluateRoles(List<TimeEvaluateRole> timeEvaluateRoles) {
+        this.timeEvaluateRoles = timeEvaluateRoles;
+    }
+
     @OneToMany(mappedBy = "evaluate")
     @JsonIgnore
     private List<TimeEvaluateRole> timeEvaluateRoles;

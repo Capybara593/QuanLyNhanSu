@@ -1,9 +1,6 @@
 package DA.backend.service;
 
-import DA.backend.entity.Evaluate;
-import DA.backend.entity.Question;
-import DA.backend.entity.User;
-import DA.backend.entity.UserEvaluate;
+import DA.backend.entity.*;
 import DA.backend.repository.EvaluateRepository;
 import DA.backend.repository.QuestionSetRepository;
 import DA.backend.repository.UserEvaluateRepository;
@@ -35,35 +32,27 @@ public class UserEvaluateService {
             User user = optionalUser.get();
             Evaluate evaluate = optionalEvaluate.get();
 
-            // Tạo danh sách UserEvaluate để lưu tất cả các câu trả lời cần thêm hoặc cập nhật
-            List<UserEvaluate> userEvaluatesToSave = new ArrayList<>();
-
-            // Lặp qua từng câu hỏi và kiểm tra xem UserEvaluate đã tồn tại chưa
             for (Question question : questions) {
-                // Kiểm tra xem UserEvaluate đã tồn tại chưa
                 Optional<UserEvaluate> existingUserEvaluate = userEvaluateRepository
                         .findByUserIdAndEvaluateIdAndQuestionId(user.getId(), evaluate.getId(), question.getId());
 
+                UserEvaluate userEvaluate;
                 if (existingUserEvaluate.isPresent()) {
-                    // Nếu đã tồn tại, cập nhật điểm (score) và thêm vào danh sách để lưu
-                    UserEvaluate userEvaluate = existingUserEvaluate.get();
+                    userEvaluate = existingUserEvaluate.get();
                     userEvaluate.setScore(question.getCore());
-                    userEvaluatesToSave.add(userEvaluate);
                 } else {
-                    // Nếu chưa tồn tại, tạo mới UserEvaluate
-                    UserEvaluate userEvaluate = new UserEvaluate();
-                    userEvaluate.setEvaluate(evaluate);
-                    userEvaluate.setUser(user);
-                    userEvaluate.setQuestion(question);
+                    userEvaluate = new UserEvaluate();
+                    UserEvaluateId userEvaluateId = new UserEvaluateId();
+                    userEvaluateId.setEvaluateId(evaluate.getId());
+                    userEvaluateId.setUserId(user.getId());
+                    userEvaluate.setId(userEvaluateId);
                     userEvaluate.setScore(question.getCore());
-                    userEvaluatesToSave.add(userEvaluate);
                 }
+                userEvaluateRepository.save(userEvaluate);
             }
-
-            // Lưu tất cả vào cơ sở dữ liệu (thêm mới hoặc cập nhật)
-            userEvaluateRepository.saveAll(userEvaluatesToSave);
         }
     }
+
 
     // Phương thức tính tổng điểm đánh giá cho một User trong một Evaluate
     public int calculateTotalScore(String userId, Long evaluateId) {

@@ -22,7 +22,7 @@ public class TimeEvaluateRoleController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Void> updateTimeEvaluateRole(@RequestBody TimeEvaluateRole timeEvaluateRole) {
+    public ResponseEntity<Void> updateTimeEvaluateRole(@RequestBody List<TimeEvaluateRole> timeEvaluateRole) {
         timeEvaluateRoleService.updateTimeEvaluateRole(timeEvaluateRole);
         return ResponseEntity.ok().build();
     }

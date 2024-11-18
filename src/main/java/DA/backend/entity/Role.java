@@ -11,29 +11,31 @@ import lombok.ToString;
 import java.util.List;
 
 
-@Data
 @Entity
 @Table(name = "role")
 public class Role {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "Tên không được bỏ trống")
     @Column(name = "name", length = 50, nullable = false)
-    @Size(max = 50,message = "Tên phải nhỏ hơn 50 ký tự")
+    @Size(max = 50, message = "Tên phải nhỏ hơn 50 ký tự")
     private String name;
 
-    // nối
-    @ToString.Exclude
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_role",
+    @JoinTable(
+            name = "user_role",
             joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     @JsonBackReference
     @JsonIgnore
     private List<User> users;
+
+    @OneToMany(mappedBy = "role")
+    @JsonIgnore
+    private List<TimeEvaluateRole> timeEvaluateRoles;
 
     public Role() {}
 
@@ -41,6 +43,7 @@ public class Role {
         this.name = name;
     }
 
+    // Getters và setters
     public Long getId() {
         return id;
     }
@@ -53,17 +56,15 @@ public class Role {
         return name;
     }
 
-
-
     public void setName(String name) {
         this.name = name;
     }
 
+    public List<TimeEvaluateRole> getTimeEvaluateRoles() {
+        return timeEvaluateRoles;
+    }
 
-
-    @OneToMany(mappedBy = "role")
-    @JsonIgnore
-    private List<TimeEvaluateRole> timeEvaluateRoles;
+    public void setTimeEvaluateRoles(List<TimeEvaluateRole> timeEvaluateRoles) {
+        this.timeEvaluateRoles = timeEvaluateRoles;
+    }
 }
-
-
