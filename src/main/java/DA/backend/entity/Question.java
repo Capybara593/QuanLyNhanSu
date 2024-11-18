@@ -64,7 +64,15 @@ public class Question {
     public void setCore(int core) {
         this.core = core;
     }
+    @OneToMany(mappedBy = "question")
+    @JsonIgnore
+    private List<UserEvaluate> userEvaluates;
 
+    public List<UserEvaluate> getUserEvaluates() {
+        return userEvaluates;
+    }
 
-
+    public void setUserEvaluates(List<UserEvaluate> userEvaluates) {
+        this.userEvaluates = userEvaluates;
+    }
 }

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.Year;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "evaluate")
@@ -23,6 +25,8 @@ public class Evaluate {
     private Long id;
     private String name;
     private Year year;
+//    private Date startDay;
+//    private Date endDay;
     public Year getYear() {
         return year;
     }
@@ -60,20 +64,23 @@ public class Evaluate {
     @JsonIgnore
     private QuestionSet questionSet;
 
-    public List<User> getUsers() {
-        return users;
-    }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
 
-    @ManyToMany
-    @JoinTable(
-            name = "evaluate_user",
-            joinColumns = @JoinColumn(name = "evaluate_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+
+    @OneToMany(mappedBy = "evaluate")
     @JsonIgnore
-    private List<User> users;
+    private List<UserEvaluate> userEvaluates;
+
+
+    public List<UserEvaluate> getUserEvaluates() {
+        return userEvaluates;
+    }
+
+    public void setUserEvaluates(List<UserEvaluate> userEvaluates) {
+        this.userEvaluates = userEvaluates;
+    }
+
+    @OneToMany(mappedBy = "evaluate")
+    @JsonIgnore
+    private List<TimeEvaluateRole> timeEvaluateRoles;
 }

@@ -32,6 +32,7 @@ public class Role {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonBackReference
+    @JsonIgnore
     private List<User> users;
 
     public Role() {}
@@ -52,9 +53,17 @@ public class Role {
         return name;
     }
 
+
+
     public void setName(String name) {
         this.name = name;
     }
+
+
+
+    @OneToMany(mappedBy = "role")
+    @JsonIgnore
+    private List<TimeEvaluateRole> timeEvaluateRoles;
 }
 
 

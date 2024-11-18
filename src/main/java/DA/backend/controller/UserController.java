@@ -43,13 +43,13 @@ public class UserController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody @Valid User user, BindingResult result) {
-        if (result.hasErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(errors);
-        }
+//        if (result.hasErrors()) {
+//            List<String> errors = result.getFieldErrors()
+//                    .stream()
+//                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+//                    .collect(Collectors.toList());
+//            return ResponseEntity.badRequest().body(errors);
+//        }
 
         if (userService.addUser(user)) {
             emailService.sendEmail(user.getEmail(),

@@ -110,6 +110,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonManagedReference
+    @JsonIgnore
     private Set<Role> roles;
 
     public String getPassword() {
@@ -202,20 +203,15 @@ public class User {
         this.address = address;
     }
 
-    public List<Evaluate> getEvaluates() {
-        return evaluates;
+   @OneToMany(mappedBy = "user")
+   @JsonIgnore
+    private List<UserEvaluate> userEvaluates;
+
+    public List<UserEvaluate> getUserEvaluates() {
+        return userEvaluates;
     }
 
-    public void setEvaluates(List<Evaluate> evaluates) {
-        this.evaluates = evaluates;
+    public void setUserEvaluates(List<UserEvaluate> userEvaluates) {
+        this.userEvaluates = userEvaluates;
     }
-
-    @ManyToMany
-    @JoinTable(
-            name = "evaluate_user",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "evaluate_id")
-    )
-    @JsonIgnore
-    private List<Evaluate> evaluates;
 }

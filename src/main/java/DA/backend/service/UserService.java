@@ -1,9 +1,7 @@
 package DA.backend.service;
 
-import DA.backend.entity.IdGenerator;
-import DA.backend.entity.Role;
-import DA.backend.entity.User;
-import DA.backend.entity.UserDTO;
+import DA.backend.entity.*;
+import DA.backend.repository.DepartmentRepository;
 import DA.backend.repository.RoleRepository;
 import DA.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +24,13 @@ public class UserService {
    private  EmailService emailService;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    DepartmentRepository departmentRepository;
     public static final Random random = new Random();
     private final BCryptPasswordEncoder paswordHash = new BCryptPasswordEncoder();
 
     public boolean addUser(User user){
+//        Optional<Department> optionalDepartment = departmentRepository.findById(id);
         Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
         if(optionalUser.isPresent()){
             return false;
@@ -50,6 +51,10 @@ public class UserService {
             String encryptedPassword = paswordHash.encode(userId);
             user.setPassword(encryptedPassword);
             user.setId(userId);
+//            if(optionalDepartment.isPresent()){
+//                Department department = optionalDepartment.get();
+//                department.getUsers().add(user);
+//            }
             try {
                 userRepository.save(user);
                 status = true;

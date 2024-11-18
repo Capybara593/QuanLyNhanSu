@@ -2,13 +2,16 @@ package DA.backend;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class SecurityConfig {
+public class SecurityConfig  {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -20,8 +23,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())  // Tắt CSRF theo cách mới
                 .authorizeHttpRequests(auth -> auth  // Sử dụng cấu hình mới cho quyền truy cập
-                        .requestMatchers("/api/user/login", "/api/user/add","/api/user/add/images",
+                        .requestMatchers("/api/user/login",
+                                "/api/user/add",
+                                "/api/user/add/images",
                                 "/api/user/**",
+                                "/api/question/**",
                                 "/api/user/update",
                                 "/api/user/{id}/image",
                                 "/api/department/add"
@@ -33,12 +39,21 @@ public class SecurityConfig {
                                 ,"/api/department"
                                 ,"/api/department/listDepartmentUser"
                                 , "/api/user/export/excel"
-                                ,"/api/position/**")
+                                ,"/api/position/**"
+                        ,"/api/evaluate/**"
+                        ,"/api/questions/**"
+                        ,"/api/questionSet/**"
+                        ,"/api/timeEvaluateRole/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
     }
+
+//    @Override
+//    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+//        configurer.defaultContentType(MediaType.APPLICATION_JSON);
+//    }
 }
 
 
