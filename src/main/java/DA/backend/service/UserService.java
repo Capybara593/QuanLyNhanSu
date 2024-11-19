@@ -87,21 +87,49 @@ public class UserService {
             userRepository.save(user);
         }
     }
-    public void updateUser(User user){
+    public void updateUser(User user,MultipartFile image)throws IOException{
         Optional<User> optionalUser = userRepository.findById(user.getId());
         if(optionalUser.isPresent()){
             User user1 =  optionalUser.get();
-            user1.setName(user.getName());
-            user1.setAddress(user.getAddress());
-            user1.setEmail(user.getEmail());
-            user1.setImage(user.getImage());
-            user1.setSex(user.getSex());
-            user1.setAddress(user.getAddress());
-            user1.setBirthDay(user.getBirthDay());
-            user1.setHomeTown(user.getHomeTown());
-            user1.setNationality(user.getNationality());
-            user1.setPhoneNumber(user.getPhoneNumber());
-            user1.setPosition(user.getPosition());
+            if (image != null || !image.isEmpty()) {
+                String encodedImage = Base64.getEncoder().encodeToString(image.getBytes());
+                user1.setImage(encodedImage);
+            }
+            if(user.getName()!= null){
+                user1.setName(user.getName());
+            }
+            if(user.getAddress()!= null){
+                user1.setAddress(user.getAddress());
+            }
+            if(user.getEmail() != null){
+                user1.setEmail(user.getEmail());
+            }
+
+            if(user.getSex() != null){
+                user1.setSex(user.getSex());
+            }
+           if(user.getAddress()!=null){
+               user1.setAddress(user.getAddress());
+           }
+           if(user.getBirthDay()!= null){
+               user1.setBirthDay(user.getBirthDay());
+           }
+           if(user.getHomeTown()!=null){
+               user1.setHomeTown(user.getHomeTown());
+           }
+           if(user.getNationality() != null){
+               user1.setNationality(user.getNationality());
+            }
+           if(user.getPhoneNumber() != null){
+               user1.setPhoneNumber(user.getPhoneNumber());
+           }
+            if(user.getPosition()!= null){
+                user1.setPosition(user.getPosition());
+            }
+          if(user.getDepartment()!= null){
+              user1.setDepartment(user.getDepartment());
+          }
+
             userRepository.save(user1);
         }
     }

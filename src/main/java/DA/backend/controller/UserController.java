@@ -70,7 +70,7 @@ public class UserController {
         }
     }
     @PutMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> updateUser(@RequestParam UserDTO userDTO,@RequestParam("image")MultipartFile image) {
         try {
             User user = userService.checkUser(userDTO.getId());
             if (user == null) {
@@ -81,7 +81,7 @@ public class UserController {
             user = userService.convertToEntity(userDTO);
 
             // Lưu thông tin
-            userService.updateUser(user);
+            userService.updateUser(user,image);
             return ResponseEntity.ok("Update success");
         } catch (Exception e) {
             e.printStackTrace();
