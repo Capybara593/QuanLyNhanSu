@@ -2,47 +2,64 @@ package DA.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "user_evaluate")
 public class UserEvaluate {
 
-    @EmbeddedId
-    private UserEvaluateId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(name = "userId")
-    @JsonIgnore
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @ManyToOne
-    @MapsId("evaluateId")
-    @JoinColumn(name = "evaluateId")
-    @JsonIgnore
+    @JoinColumn(name = "userAdminId", nullable = true)
+    private User userAdmin;
+
+    @ManyToOne
+    @JoinColumn(name = "userManager", nullable = true)
+    private User userManager;
+
+    @ManyToOne
+    @JoinColumn(name = "evaluateId", nullable = false)
     private Evaluate evaluate;
 
     @ManyToOne
-    @MapsId("questionId")
-    @JoinColumn(name = "questionId")
-    @JsonIgnore
+    @JoinColumn(name = "questionId", nullable = false)
     private Question question;
 
-    // Cột bổ sung (nếu cần)
-    @Column(name = "sore")
-    private int  score;
+    @Column(name = "score", nullable = true)
+    private Integer score;
+
+    @Column(name = "score_admin", nullable = true)
+    private Integer scoreAdmin;
+
+    @Column(name = "score_manager", nullable = true)
+    private Integer scoreManager;
 
     // Constructors
     public UserEvaluate() {}
 
+    public UserEvaluate(User user, User userAdmin, User userManager, Evaluate evaluate, Question question, Integer score, Integer scoreAdmin, Integer scoreManager) {
+        this.user = user;
+        this.userAdmin = userAdmin;
+        this.userManager = userManager;
+        this.evaluate = evaluate;
+        this.question = question;
+        this.score = score;
+        this.scoreAdmin = scoreAdmin;
+        this.scoreManager = scoreManager;
+    }
 
-    // Getters and Setters
-    public UserEvaluateId getId() {
+    // Getters và Setters
+    public Long getId() {
         return id;
     }
 
-    public void setId(UserEvaluateId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -52,6 +69,22 @@ public class UserEvaluate {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public User getUserAdmin() {
+        return userAdmin;
+    }
+
+    public void setUserAdmin(User userAdmin) {
+        this.userAdmin = userAdmin;
+    }
+
+    public User getUserManager() {
+        return userManager;
+    }
+
+    public void setUserManager(User userManager) {
+        this.userManager = userManager;
     }
 
     public Evaluate getEvaluate() {
@@ -70,35 +103,27 @@ public class UserEvaluate {
         this.question = question;
     }
 
-    public int getScore() {
+    public Integer getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(Integer score) {
         this.score = score;
     }
 
-    public UserEvaluate(UserEvaluateId id, User user, Evaluate evaluate, Question question, int score) {
-        this.id = id;
-        this.user = user;
-        this.evaluate = evaluate;
-        this.question = question;
-        this.score = score;
+    public Integer getScoreAdmin() {
+        return scoreAdmin;
     }
 
-    // equals() and hashCode() dựa trên 'id'
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserEvaluate that = (UserEvaluate) o;
-
-        return Objects.equals(id, that.id);
+    public void setScoreAdmin(Integer scoreAdmin) {
+        this.scoreAdmin = scoreAdmin;
     }
 
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    public Integer getScoreManager() {
+        return scoreManager;
+    }
+
+    public void setScoreManager(Integer scoreManager) {
+        this.scoreManager = scoreManager;
     }
 }

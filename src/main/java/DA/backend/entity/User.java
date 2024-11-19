@@ -207,6 +207,8 @@ public class User {
    @JsonIgnore
     private List<UserEvaluate> userEvaluates;
 
+
+
     public List<UserEvaluate> getUserEvaluates() {
         return userEvaluates;
     }
