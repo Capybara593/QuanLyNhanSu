@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -24,12 +25,9 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
+import DA.backend.entity.Role;
 import static org.apache.catalina.manager.StatusTransformer.writeHeader;
 
 @RestController
@@ -62,12 +60,32 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String id,@RequestParam String password){
-        if(userService.login(id, password)){
-            return "Login Success";
-        }else {
-            return "Login Fail";
+    public ResponseEntity<?> login(@RequestParam String id, @RequestParam String password) {
+        Optional<User> optionalUser = userService.findById(id);
+
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid ID or password");
         }
+
+        User user = optionalUser.get();
+
+        // Kiểm tra mật khẩu và trạng thái xóa
+        if (!user.isDelete() && userService.checkPassword(password, user.getPassword())) {
+            // Lấy vai trò của người dùng
+            String role = user.getRoles().stream()
+                    .findFirst()
+                    .map(Role::getName)
+                    .orElse("EMPLOYEE");
+
+            // Trả về JSON với trạng thái và vai trò
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "Login Success");
+            response.put("role", role);
+
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid ID or password");
     }
     @PutMapping("/update")
     public ResponseEntity<String> updateUser(@RequestParam UserDTO userDTO,@RequestParam("image")MultipartFile image) {
@@ -108,10 +126,28 @@ public class UserController {
             return "Faile";
         }
     }
-    @GetMapping("/list")
-    public List<User> userList(){
-        return userService.listUser();
-    }
+//    @GetMapping("/list")
+//    public List<User> userList(){
+//        return userService.listUser();
+//    }
+@GetMapping("/list")
+public ResponseEntity<?> userList() {
+    List<Map<String, Object>> usersWithRoles = userService.listUser().stream()
+            .map(user -> {
+                Map<String, Object> userMap = new HashMap<>();
+                userMap.put("id", user.getId());
+                userMap.put("name", user.getName());
+                userMap.put("email", user.getEmail());
+                userMap.put("avatar", user.getImage());
+                userMap.put("role", user.getRoles().stream()
+                        .findFirst()
+                        .map(Role::getName) // Lấy tên role đầu tiên
+                        .orElse("N/A")); // Nếu không có role, trả về "N/A"
+                return userMap;
+            })
+            .collect(Collectors.toList());
+    return ResponseEntity.ok(usersWithRoles);
+}
     @GetMapping("/listUserDelete")
     public List<User> userListDelete(){
         return userService.listUserDelete();
@@ -147,14 +183,57 @@ public class UserController {
         }
 
     }
-    @GetMapping("/profile")
-    public ResponseEntity<?> profileUser(@RequestParam String id) {
-        User user = userService.checkUser(id);
-        if (user == null) {
+//    @GetMapping("/profile")
+//    public ResponseEntity<?> profileUser(@RequestParam String id) {
+//        User user = userService.checkUser(id);
+//        if (user == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+//        }
+//        UserDTO userDTO = userService.convertToDTO(user);
+//        return ResponseEntity.ok(userDTO);
+//    }
+@GetMapping("/profile")
+public ResponseEntity<?> profileUser(@RequestParam String id) {
+    User user = userService.checkUser(id);
+    if (user == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+
+    // Tạo DTO
+    UserDTO userDTO = userService.convertToDTO(user);
+
+    // Lấy vai trò (giả sử User có danh sách roles)
+    String role = user.getRoles().stream()
+            .findFirst()
+            .map(Role::getName)
+            .orElse("N/A"); // Giá trị mặc định nếu không có role
+    userDTO.setRole(role);
+
+    return ResponseEntity.ok(userDTO);
+}
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/updateRole")
+    public ResponseEntity<?> updateUserRole(@RequestParam String userId, @RequestParam String newRole) {
+        Optional<User> optionalUser = userService.findById(userId);
+
+        if (optionalUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        UserDTO userDTO = userService.convertToDTO(user);
-        return ResponseEntity.ok(userDTO);
+
+        User user = optionalUser.get();
+
+        try {
+            // Cập nhật vai trò
+            boolean updated = userService.updateUserRole(user, newRole);
+
+            if (updated) {
+                return ResponseEntity.ok("Role updated successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role update failed. Role not found.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating role");
+        }
     }
     @GetMapping("/profile/image")
     public ResponseEntity<byte[]> getUserImage(@RequestParam String id) throws Exception {

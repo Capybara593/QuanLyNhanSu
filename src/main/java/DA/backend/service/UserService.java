@@ -179,6 +179,10 @@ public class UserService {
         userDTO.setPhoneNumber(user.getPhoneNumber());
         userDTO.setSex(user.getSex());
         userDTO.setImage(user.getImage());
+        userDTO.setRole(user.getRoles().stream()
+                .findFirst()
+                .map(Role::getName)
+                .orElse("N/A")); // Chuyển role
         return userDTO;
     }
     public Optional<String> getUserImage(String userId) {
@@ -221,6 +225,29 @@ public class UserService {
         }
         return false;
     }
+    public Optional<User> findById(String id) {
+        return userRepository.findById(id);
+    }
 
+    public boolean updateUserRole(User user, String newRoleName) {
+        // Tìm kiếm role mới từ database
+        Optional<Role> optionalRole = roleRepository.findByName(newRoleName);
+
+        if (optionalRole.isPresent()) {
+            Role newRole = optionalRole.get();
+
+            // Cập nhật vai trò của người dùng
+            Set<Role> roles = new HashSet<>();
+            roles.add(newRole);
+            user.setRoles(roles);
+
+            // Lưu thay đổi
+            userRepository.save(user);
+            return true;
+        } else {
+            // Vai trò không tồn tại
+            return false;
+        }
+    }
 
 }
