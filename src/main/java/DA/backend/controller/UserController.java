@@ -39,6 +39,7 @@ public class UserController {
     @Autowired
     private EmailService emailService;
 
+
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody @Valid User user, BindingResult result) {
 //        if (result.hasErrors()) {
@@ -88,24 +89,40 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid ID or password");
     }
     @PutMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestParam UserDTO userDTO,@RequestParam("image")MultipartFile image) {
+    public ResponseEntity<String> updateUser(
+            @RequestBody UserDTO userDTO,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
         try {
+            // Kiểm tra ID của người dùng
+            if (userDTO.getId() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID is missing");
+            }
             User user = userService.checkUser(userDTO.getId());
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
 
-            // Cập nhật thông tin từ DTO sang entity
+            // Cập nhật thông tin từ DTO sang Entity
             user = userService.convertToEntity(userDTO);
 
-            // Lưu thông tin
-            userService.updateUser(user,image);
+            // Kiểm tra xem `image` có null hay không
+            if (image != null && !image.isEmpty()) {
+                // Thực hiện xử lý ảnh nếu tồn tại
+                userService.updateUser(user, image);
+            } else {
+                // Nếu không có ảnh, chỉ cập nhật thông tin
+                userService.updateUserWithoutImage(user);
+            }
+
             return ResponseEntity.ok("Update success");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed: " + e.getMessage());
         }
     }
+
+
     // API lấy ảnh đại diện
     @GetMapping("/{id}/image")
     public ResponseEntity<String> getAvatar(@PathVariable String id) {

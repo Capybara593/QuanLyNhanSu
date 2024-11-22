@@ -250,4 +250,10 @@ public class UserService {
         }
     }
 
+    public void updateUserWithoutImage(User user) {
+        // Chỉ cập nhật thông tin không bao gồm file ảnh
+        userRepository.save(user);
+    }
+
+
 }
