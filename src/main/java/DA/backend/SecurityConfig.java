@@ -29,6 +29,7 @@ public class SecurityConfig  {
                                 "/api/user/**",
                                 "/api/question/**",
                                 "/api/user/update",
+                                "/api/user/profile",
                                 "/api/user/{id}/image",
                                 "/api/department/add"
                                 ,"/api/department/add"
@@ -39,7 +40,8 @@ public class SecurityConfig  {
                                 ,"/api/department"
                                 ,"/api/department/listDepartmentUser"
                                 , "/api/user/export/excel"
-                                ,"/api/position/**"
+                                ,"/api/position/**",
+                                "/api/file/**"
                         ,"/api/evaluate/**"
                         ,"/api/questions/**"
                         ,"/api/questionSet/**"

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/department")
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class DepartmentController {
     @Autowired
     DepartmentService departmentService;

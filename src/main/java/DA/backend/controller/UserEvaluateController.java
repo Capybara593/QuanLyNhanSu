@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/userEvaluate")
+@CrossOrigin
 public class UserEvaluateController {
 
     @Autowired

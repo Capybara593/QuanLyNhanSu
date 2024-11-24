@@ -126,9 +126,12 @@ public class UserService {
             if(user.getPosition()!= null){
                 user1.setPosition(user.getPosition());
             }
-          if(user.getDepartment()!= null){
-              user1.setDepartment(user.getDepartment());
-          }
+            if (user.getDepartment() != null) {
+                user1.setDepartment(user.getDepartment());
+            } else {
+                user1.setDepartment(user1.getDepartment()); // Giữ nguyên giá trị gốc
+            }
+
 
             userRepository.save(user1);
         }
@@ -148,6 +151,7 @@ public class UserService {
     public User checkUser(String id) {
         return userRepository.findById(id).orElse(null);
     }
+
 
 
 
@@ -195,19 +199,23 @@ public class UserService {
     }
 
     public User convertToEntity(UserDTO userDTO) {
-        User user = new User();
-        user.setId(userDTO.getId());
-        user.setName(userDTO.getName());
-        user.setBirthDay(userDTO.getBirthDay());
-        user.setNationality(userDTO.getNationality());
-        user.setHomeTown(userDTO.getHomeTown());
-        user.setAddress(userDTO.getAddress());
-        user.setEmail(userDTO.getEmail());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setSex(userDTO.getSex());
-        user.setImage(userDTO.getImage());
+        // Lấy thực thể gốc từ cơ sở dữ liệu
+        User user = userRepository.findById(userDTO.getId()).orElse(new User());
+
+        if (userDTO.getName() != null) user.setName(userDTO.getName());
+        if (userDTO.getBirthDay() != null) user.setBirthDay(userDTO.getBirthDay());
+        if (userDTO.getNationality() != null) user.setNationality(userDTO.getNationality());
+        if (userDTO.getHomeTown() != null) user.setHomeTown(userDTO.getHomeTown());
+        if (userDTO.getAddress() != null) user.setAddress(userDTO.getAddress());
+        if (userDTO.getEmail() != null) user.setEmail(userDTO.getEmail());
+        if (userDTO.getPhoneNumber() != null) user.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userDTO.getSex() != null) user.setSex(userDTO.getSex());
+        if (userDTO.getImage() != null) user.setImage(userDTO.getImage());
+
+        // Bảo toàn các trường gốc như password và department
         return user;
     }
+
 
     public boolean addImages(String id, MultipartFile image) throws IOException {
         if (image == null || image.isEmpty()) {

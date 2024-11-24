@@ -46,7 +46,9 @@ public class User {
     private String phoneNumber;
 
     @Lob
+    @Column(columnDefinition = "LONGTEXT") // Hibernate sẽ sử dụng kiểu LONGTEXT trong MySQL
     private String image;
+
     private String sex;
     private String password;
     private boolean isDelete = false;

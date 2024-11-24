@@ -32,7 +32,8 @@ import static org.apache.catalina.manager.StatusTransformer.writeHeader;
 
 @RestController
 @RequestMapping("api/user")
-@CrossOrigin(origins = "*")
+
+@CrossOrigin
 public class UserController {
     @Autowired
    private UserService userService;
@@ -215,19 +216,15 @@ public ResponseEntity<?> profileUser(@RequestParam String id) {
     if (user == null) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
-
-    // Tạo DTO
     UserDTO userDTO = userService.convertToDTO(user);
-
-    // Lấy vai trò (giả sử User có danh sách roles)
     String role = user.getRoles().stream()
             .findFirst()
             .map(Role::getName)
-            .orElse("N/A"); // Giá trị mặc định nếu không có role
+            .orElse("N/A");
     userDTO.setRole(role);
-
     return ResponseEntity.ok(userDTO);
 }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateRole")
     public ResponseEntity<?> updateUserRole(@RequestParam String userId, @RequestParam String newRole) {

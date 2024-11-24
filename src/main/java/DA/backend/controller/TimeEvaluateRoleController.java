@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/timeEvaluateRole")
+@CrossOrigin
 public class TimeEvaluateRoleController {
 
     @Autowired
